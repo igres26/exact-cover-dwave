@@ -15,7 +15,7 @@ def read_file(file_name, instance):
         solution (list): list of the correct outputs of the instance for testing.
         clauses (list): list of all clauses, with the qubits each clause acts upon.
     """
-    file = open('../data3sat/{q}bit/n{q}i{i}.txt'.format(q=file_name, i=instance), 'r')
+    file = open('n{q}i{i}.txt'.format(q=file_name, i=instance), 'r')
     control = list(map(int, file.readline().split()))
     solution = list(map(str, file.readline().split()))
     clauses = [list(map(int, file.readline().split())) for _ in range(control[1])]
@@ -50,9 +50,12 @@ def h_problem(qubits, clauses):
             Hamiltonian to the corresponding matrices and target qubits.
     """
     z = sympy.symbols(" ".join((f"z{i}" for i in range(qubits))))
-    z_matrix = (matrices.I - matrices.Z) / 2.0
+    s = []
+    for x in z:
+        s.append((x**2, x))
     smap = {s: i for i, s in enumerate(z)}
-    sham = sum((sum(z[i - 1] for i in clause) - 1) ** 2 for clause in clauses)
+    sham = sympy.expand(sum((sum(z[i - 1] for i in clause) - 1) ** 2 for clause in clauses))
+    sham = sham.subs(s)
     return sham, smap
 
 
@@ -68,9 +71,12 @@ def h_weights(qubits, clauses, times):
             Hamiltonian to the corresponding matrices and target qubits.
     """
     z = sympy.symbols(" ".join((f"z{i}" for i in range(qubits))))
-    z_matrix = (matrices.I - matrices.Z) / 2.0
+    s = []
+    for x in z:
+        s.append((x**2, x))
     smap = {s: i for i, s in enumerate(z)}
-    sham = sum((sum(z[i - 1] for i in clause) - 1) ** 2 for clause in clauses)
+    sham = sympy.expand(sum((sum(z[i - 1] for i in clause) - 1) ** 2 for clause in clauses))
+    sham = sham.subs(s)
     return sham, smap
 
 
